@@ -59,6 +59,7 @@
       color: #ffffff;
       text-decoration: none;
       box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      cursor: pointer;
     }
 
     .share-fb {
@@ -100,22 +101,25 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
   <script>
-    // 1. Target URL to share
-    const pageUrl = "https://sites.google.com/moe-dl.edu.my/chkb-xcc5305/%E5%AD%A6%E6%A0%A1%E4%B8%8E%E7%A4%BE%E5%8C%BA-sekolah-komuniti/%E6%B4%BB%E5%8A%A8-aktiviti";
+    // 1. Get Google Site page URL safely for sharing
+    let targetPageUrl = document.referrer;
+    if (!targetPageUrl || targetPageUrl.includes("marshatn.github.io")) {
+      targetPageUrl = "https://sites.google.com/moe-dl.edu.my/chkb-xcc5305/";
+    }
 
-    // Set Share Links
-    document.getElementById('fbShare').href = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(pageUrl);
-    document.getElementById('waShare').href = "https://api.whatsapp.com/send?text=" + encodeURIComponent(pageUrl);
+    document.getElementById('fbShare').href = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(targetPageUrl);
+    document.getElementById('waShare').href = "https://api.whatsapp.com/send?text=" + encodeURIComponent(targetPageUrl);
 
-    // 2. Realtime Database Setup
+    // 2. Realtime Database Config with your URL
     const firebaseConfig = {
-      databaseURL: "https://like-counter-demo-default-rtdb.firebaseio.com/"
+      projectId: "xcc5305-like-program",
+      databaseURL: "https://xcc5305-like-program-default-rtdb.asia-southeast1.firebasedatabase.app/"
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     const likeRef = db.ref('likes/item_1');
 
-    // Sync count from database
+    // Sync count from your database
     likeRef.on('value', (snapshot) => {
       document.getElementById('likeCount').textContent = snapshot.val() || 0;
     });
