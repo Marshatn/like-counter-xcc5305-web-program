@@ -1,89 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Like Button</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      background-color: #f9f9f9;
-    }
-    .like-btn {
-      background-color: #ffffff;
-      border: 2px solid #e0e0e0;
-      border-radius: 20px;
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.2s ease;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    .like-btn:hover {
-      background-color: #f0f0f0;
-    }
-    .heart {
-      color: #e0e0e0;
-      transition: color 0.2s ease;
-    }
-    .like-btn.liked .heart {
-      color: #e74c3c;
-    }
-    .count {
-      font-weight: bold;
-      color: #333;
-    }
-  </style>
 </head>
 <body>
 
-  <button class="like-btn" id="likeButton" onclick="toggleLike()">
-    <span class="heart">♥</span>
-    <span id="likeText">Like</span>
-    <span class="count" id="likeCount">0</span>
-  </button>
+<!-- LikeBtn.com BEGIN -->
+<span class="likebtn-wrapper" 
+      data-theme="custom" 
+      data-icon_l="hrt2" 
+      data-icon_l_c="#c70712" 
+      data-icon_l_c_v="#fb0591" 
+      data-dislike_enabled="false"
+      data-show_dislike_label="false"
+      data-icon_dislike_show="false" 
+      data-counter_zero_show="true" 
+      data-share_size="small" 
+      data-item_url="https://sites.google.com/moe-dl.edu.my/chkb-xcc5305/%E5%AD%A6%E6%A0%A1%E4%B8%8E%E7%A4%BE%E5%8C%BA-sekolah-komuniti/%E6%B4%BB%E5%8A%A8-aktiviti" 
+      data-tooltip_enabled="false"></span>
 
-  <script>
-    // Load existing count from LocalStorage or start at 0
-    let count = parseInt(localStorage.getItem('like_count')) || 0;
-    let isLiked = localStorage.getItem('is_liked') === 'true';
-
-    const btn = document.getElementById('likeButton');
-    const countDisplay = document.getElementById('likeCount');
-
-    function updateDisplay() {
-      countDisplay.textContent = count;
-      if (isLiked) {
-        btn.classList.add('liked');
-      } else {
-        btn.classList.remove('liked');
-      }
-    }
-
-    function toggleLike() {
-      if (isLiked) {
-        count--;
-        isLiked = false;
-      } else {
-        count++;
-        isLiked = true;
-      }
-      localStorage.setItem('like_count', count);
-      localStorage.setItem('is_liked', isLiked);
-      updateDisplay();
-    }
-
-    // Initialize button state on page load
-    updateDisplay();
-  </script>
+<script>
+  (function(d,e,s){
+    if(d.getElementById("likebtn_wjs")) return;
+    var a = d.createElement(e);
+    var m = d.getElementsByTagName(e)[0];
+    a.async = 1;
+    a.id = "likebtn_wjs";
+    a.src = s;
+    m.parentNode.insertBefore(a,m);
+  })(document,"script","https://w.likebtn.com/js/w/widget.js");
+</script>
+<!-- LikeBtn.com END -->
 
 </body>
 </html>
