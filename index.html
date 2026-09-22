@@ -1,41 +1,132 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Like Button</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Like & Share Button</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: transparent;
+    }
+
+    .widget-container {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Like Button Styling */
+    .like-btn {
+      background: #ffffff;
+      border: 1px solid #dcdcdc;
+      border-radius: 4px;
+      padding: 6px 12px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #333333;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      user-select: none;
+    }
+
+    .like-btn:active {
+      transform: scale(0.96);
+    }
+
+    .heart-icon {
+      color: #e74c3c;
+      font-size: 16px;
+    }
+
+    /* Share Buttons Styling */
+    .share-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #ffffff;
+      text-decoration: none;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .share-fb {
+      background-color: #1877F2;
+    }
+
+    .share-wa {
+      background-color: #25D366;
+    }
+
+    .share-btn:hover {
+      opacity: 0.9;
+    }
+  </style>
 </head>
 <body>
 
-<!-- LikeBtn.com BEGIN -->
-<span class="likebtn-wrapper" 
-      data-theme="custom" 
-      data-icon_l="hrt2" 
-      data-icon_l_c="#c70712" 
-      data-icon_l_c_v="#fb0591" 
-      data-dislike_enabled="false"
-      data-show_dislike_label="false"
-      data-voting_cancelable="false"
-      data-voting_frequency="0"
-      data-counter_zero_show="true" 
-      data-share_enabled="true"
-      data-share_size="small" 
-      data-share_type="popup"
-      data-share_social_networks="facebook,whatsapp,twitter,telegram"
-      data-item_url="https://sites.google.com/moe-dl.edu.my/chkb-xcc5305/%E5%AD%A6%E6%A0%A1%E4%B8%8E%E7%A4%BE%E5%8C%BA-sekolah-komuniti/%E6%B4%BB%E5%8A%A8-aktiviti" 
-      data-tooltip_enabled="false"></span>
+  <div class="widget-container">
+    <!-- Heart Like Button -->
+    <button class="like-btn" id="likeButton" onclick="addLike()">
+      <span class="heart-icon">♥</span>
+      <span>Like</span>
+      <span id="likeCount">...</span>
+    </button>
 
-<script>
-  (function(d,e,s){
-    if(d.getElementById("likebtn_wjs")) return;
-    var a = d.createElement(e);
-    var m = d.getElementsByTagName(e)[0];
-    a.async = 1;
-    a.id = "likebtn_wjs";
-    a.src = s;
-    m.parentNode.insertBefore(a,m);
-  })(document,"script","https://w.likebtn.com/js/w/widget.js");
-</script>
-<!-- LikeBtn.com END -->
+    <!-- Facebook Share Button -->
+    <a id="fbShare" class="share-btn share-fb" target="_blank" rel="noopener">
+      Facebook
+    </a>
+
+    <!-- WhatsApp Share Button -->
+    <a id="waShare" class="share-btn share-wa" target="_blank" rel="noopener">
+      WhatsApp
+    </a>
+  </div>
+
+  <!-- Firebase Database SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <script>
+    // 1. Target URL to share
+    const pageUrl = "https://sites.google.com/moe-dl.edu.my/chkb-xcc5305/%E5%AD%A6%E6%A0%A1%E4%B8%8E%E7%A4%BE%E5%8C%BA-sekolah-komuniti/%E6%B4%BB%E5%8A%A8-aktiviti";
+
+    // Set Share Links
+    document.getElementById('fbShare').href = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(pageUrl);
+    document.getElementById('waShare').href = "https://api.whatsapp.com/send?text=" + encodeURIComponent(pageUrl);
+
+    // 2. Realtime Database Setup
+    const firebaseConfig = {
+      databaseURL: "https://like-counter-demo-default-rtdb.firebaseio.com/"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const likeRef = db.ref('likes/item_1');
+
+    // Sync count from database
+    likeRef.on('value', (snapshot) => {
+      document.getElementById('likeCount').textContent = snapshot.val() || 0;
+    });
+
+    // Add like on click
+    function addLike() {
+      likeRef.transaction((count) => {
+        return (count || 0) + 1;
+      });
+    }
+  </script>
 
 </body>
 </html>
