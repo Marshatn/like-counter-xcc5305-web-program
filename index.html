@@ -79,24 +79,27 @@
       transform-origin: center;
     }
 
-    /* Dynamic Click Effect: Intense Bumping and Color Flash */
+    /* Dynamic Click Effect: Bumping and Color Flash (Strictly Red/Pink/Neon, NO BLACK) */
     @keyframes clickBump {
       0% { 
         transform: scale(1); 
         fill: #ff1a40; 
+        filter: drop-shadow(0 0 5px #ff1a40);
       }
       30% { 
         transform: scale(1.6); 
         fill: #ff3399; /* Bright Neon */
-        filter: drop-shadow(0 0 15px #ff66cc);
+        filter: drop-shadow(0 0 18px #ff66cc);
       }
       60% { 
         transform: scale(0.9); 
-        fill: #ff0055; 
+        fill: #ff1a55; /* Vibrant pink-red */
+        filter: drop-shadow(0 0 8px #ff1a55);
       }
       100% { 
         transform: scale(1); 
         fill: #ff1a40; 
+        filter: drop-shadow(0 0 4px #ff1a40);
       }
     }
 
@@ -167,7 +170,7 @@
     const urlParams = new URLSearchParams(window.location.search);
 
     // Fallback values if none are provided in the URL
-    const defaultUrl = "https://sites.google.com/moe-dl.edu.my/chkb-xcc5305/%E5%AD%A6%E6%A0%A1%E4%B8%8E%E7%A4%BE%E5%8C%BA-sekolah-komuniti/%E6%B4%BB%E5%8A%A8-program-komuniti?authuser=0";
+    const defaultUrl = "https://sites.google.com/moe-dl.edu.my/chkb-xcc5305/%E5%AD%A6%E6%A0%A1%E4%B8%8E%E7%A4%BE%E5%8C%BA-%E7%A4%BE%E5%8C%BA/%E6%B4%BB%E5%8A%A8-program-komuniti?authuser=0";
 
     // Unique ID for Firebase (Defaults to item_1 for backward compatibility)
     const itemId = urlParams.get('id') || 'item_1';
@@ -196,8 +199,21 @@
       document.getElementById('likeCount').textContent = (currentVal === null) ? 1 : currentVal;
     });
 
-    // 5. Add like on click & trigger bumping/color-shifting animation
+    // Function to say "Thank you" using browser speech synthesis
+    function playThankYouSound() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance("Thank you");
+        utterance.rate = 1.1; 
+        utterance.pitch = 1.2; 
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    // 5. Add like on click & trigger bumping/color-shifting animation + sound
     function addLike() {
+      playThankYouSound();
+
       const heart = document.getElementById('heartIcon');
       heart.classList.remove('heart-icon', 'heart-click-bump');
       void heart.offsetWidth; // Force browser reflow
