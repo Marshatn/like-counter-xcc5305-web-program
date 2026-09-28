@@ -53,22 +53,22 @@
       height: 28px;
     }
 
-    /* Continuous Bumping & Color Shifting (Red -> Hot Pink -> Neon Pink) */
+    /* Continuous Bumping & Color Shifting (Strictly Neon Red -> Hot Pink -> Magenta, NO BLACK) */
     @keyframes bumpAndGlow {
       0%, 100% { 
         transform: scale(1); 
-        fill: #ff1a40; /* Vibrant Red */
-        filter: drop-shadow(0 0 4px #ff1a40); 
+        fill: #ff1a40; /* Neon Red */
+        filter: drop-shadow(0 0 5px #ff1a40); 
       }
       33% { 
         transform: scale(1.25); 
         fill: #ff2a85; /* Hot Pink */
-        filter: drop-shadow(0 0 8px #ff2a85); 
+        filter: drop-shadow(0 0 9px #ff2a85); 
       }
       66% { 
         transform: scale(1.1); 
-        fill: #ff007f; /* Electric Neon Pink */
-        filter: drop-shadow(0 0 12px #ff66cc); 
+        fill: #ff00ff; /* Magenta */
+        filter: drop-shadow(0 0 14px #ff66cc); 
       }
     }
 
@@ -79,27 +79,27 @@
       transform-origin: center;
     }
 
-    /* Dynamic Click Effect: Bumping and Color Flash (Strictly Red/Pink/Neon, NO BLACK) */
+    /* Dynamic Click Effect: Bumping and Color Flash (Neon Red to Magenta strictly) */
     @keyframes clickBump {
       0% { 
         transform: scale(1); 
         fill: #ff1a40; 
-        filter: drop-shadow(0 0 5px #ff1a40);
+        filter: drop-shadow(0 0 6px #ff1a40);
       }
       30% { 
         transform: scale(1.6); 
-        fill: #ff3399; /* Bright Neon */
-        filter: drop-shadow(0 0 18px #ff66cc);
+        fill: #ff00ff; /* Magenta flash */
+        filter: drop-shadow(0 0 20px #ff66cc);
       }
       60% { 
-        transform: scale(0.9); 
-        fill: #ff1a55; /* Vibrant pink-red */
-        filter: drop-shadow(0 0 8px #ff1a55);
+        transform: scale(0.95); 
+        fill: #ff3399; /* Bright Pink */
+        filter: drop-shadow(0 0 10px #ff3399);
       }
       100% { 
         transform: scale(1); 
         fill: #ff1a40; 
-        filter: drop-shadow(0 0 4px #ff1a40);
+        filter: drop-shadow(0 0 5px #ff1a40);
       }
     }
 
@@ -199,11 +199,11 @@
       document.getElementById('likeCount').textContent = (currentVal === null) ? 1 : currentVal;
     });
 
-    // Custom provided sound effect
-    const clickSound = new Audio("https://cdn.freesound.org/previews/612/612749_5121236-lq.mp3");
-    clickSound.volume = 0.8;
+    // Cute, high-pitched magical sparkle chime sound effect
+    const clickSound = new Audio("https://cdn.freesound.org/previews/536/536108_11861866-lq.mp3");
+    clickSound.volume = 0.7;
 
-    // 5. Add like on click & trigger bumping/color-shifting animation + source sound
+    // 5. Add like on click & trigger bumping animation + cute sound
     function addLike() {
       clickSound.currentTime = 0;
       clickSound.play().catch(e => console.log("Audio play blocked by browser policy until interaction"));
@@ -213,7 +213,7 @@
       void heart.offsetWidth; // Force browser reflow
       heart.classList.add('heart-click-bump');
       
-      // Resume normal bumping & color cycling after the click animation ends
+      // Resume normal neon red-to-magenta bumping after the click animation finishes
       setTimeout(() => {
         heart.classList.add('heart-icon');
       }, 400);
