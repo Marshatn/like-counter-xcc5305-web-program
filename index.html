@@ -44,53 +44,64 @@
       background: #f8f8f8;
     }
 
-    /* Wrapper to keep the heart isolated so only the heart moves */
+    /* Wrapper to isolate heart movement so text stays still */
     .heart-wrapper {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 26px;
-      height: 26px;
+      width: 28px;
+      height: 28px;
     }
 
-    /* Big Neon Heart Styling & Continuous Pulse */
-    @keyframes neonPulse {
+    /* Continuous Bumping & Color Shifting (Red -> Hot Pink -> Neon Pink) */
+    @keyframes bumpAndGlow {
       0%, 100% { 
         transform: scale(1); 
-        filter: drop-shadow(0 0 3px #ff1493) drop-shadow(0 0 8px #ff69b4); 
+        fill: #ff1a40; /* Vibrant Red */
+        filter: drop-shadow(0 0 4px #ff1a40); 
       }
-      50% { 
+      33% { 
         transform: scale(1.25); 
-        filter: drop-shadow(0 0 6px #ff1493) drop-shadow(0 0 14px #ff69b4); 
+        fill: #ff2a85; /* Hot Pink */
+        filter: drop-shadow(0 0 8px #ff2a85); 
+      }
+      66% { 
+        transform: scale(1.1); 
+        fill: #ff007f; /* Electric Neon Pink */
+        filter: drop-shadow(0 0 12px #ff66cc); 
       }
     }
 
     .heart-icon {
-      width: 24px;
-      height: 24px;
-      fill: #ff2a85; /* Neon Hot Pink */
-      animation: neonPulse 1.2s infinite ease-in-out;
+      width: 26px;
+      height: 26px;
+      animation: bumpAndGlow 1.4s infinite ease-in-out;
       transform-origin: center;
     }
 
-    /* Puff animation on click (only affects heart) */
-    @keyframes neonPuff {
+    /* Dynamic Click Effect: Intense Bumping and Color Flash */
+    @keyframes clickBump {
       0% { 
         transform: scale(1); 
-        filter: drop-shadow(0 0 4px #ff1493) drop-shadow(0 0 10px #ff69b4); 
+        fill: #ff1a40; 
       }
-      50% { 
-        transform: scale(1.7); 
-        filter: drop-shadow(0 0 10px #ff1493) drop-shadow(0 0 22px #ffff00); 
+      30% { 
+        transform: scale(1.6); 
+        fill: #ff3399; /* Bright Neon */
+        filter: drop-shadow(0 0 15px #ff66cc);
+      }
+      60% { 
+        transform: scale(0.9); 
+        fill: #ff0055; 
       }
       100% { 
         transform: scale(1); 
-        filter: drop-shadow(0 0 4px #ff1493) drop-shadow(0 0 10px #ff69b4); 
+        fill: #ff1a40; 
       }
     }
 
-    .heart-puff {
-      animation: neonPuff 0.35s ease !important;
+    .heart-click-bump {
+      animation: clickBump 0.4s ease !important;
     }
 
     /* Share Buttons Styling */
@@ -185,17 +196,17 @@
       document.getElementById('likeCount').textContent = (currentVal === null) ? 1 : currentVal;
     });
 
-    // 5. Add like on click & trigger neon puff animation
+    // 5. Add like on click & trigger bumping/color-shifting animation
     function addLike() {
       const heart = document.getElementById('heartIcon');
-      heart.classList.remove('heart-icon', 'heart-puff');
+      heart.classList.remove('heart-icon', 'heart-click-bump');
       void heart.offsetWidth; // Force browser reflow
-      heart.classList.add('heart-puff');
+      heart.classList.add('heart-click-bump');
       
-      // Resume regular neon pulsing after click effect finishes
+      // Resume normal bumping & color cycling after the click animation ends
       setTimeout(() => {
         heart.classList.add('heart-icon');
-      }, 350);
+      }, 400);
 
       // Update Firebase database count
       likeRef.transaction((count) => {
