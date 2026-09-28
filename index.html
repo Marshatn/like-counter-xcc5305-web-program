@@ -44,25 +44,37 @@
       background: #f8f8f8;
     }
 
-    /* Heart GIF Styling */
+    /* Heart Icon / Animated container */
     .heart-icon {
       width: 18px;
       height: 18px;
-      object-fit: contain;
       display: inline-block;
       vertical-align: middle;
       transition: transform 0.2s ease;
     }
 
-    /* Extra puff effect when clicked */
-    @keyframes puff {
+    /* Beating / Puffing Animation */
+    @keyframes heartbeat {
       0% { transform: scale(1); }
-      50% { transform: scale(1.4); }
-      100% { transform: scale(1); }
+      15% { transform: scale(1.3); }
+      30% { transform: scale(1); }
+      45% { transform: scale(1.2); }
+      60% { transform: scale(1); }
     }
 
+    .heart-beating {
+      animation: heartbeat 1.2s infinite ease-in-out;
+    }
+
+    /* Extra click puff */
     .heart-puff {
-      animation: puff 0.3s ease;
+      animation: puff 0.3s ease !important;
+    }
+
+    @keyframes puff {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.5); }
+      100% { transform: scale(1); }
     }
 
     /* Share Buttons Styling */
@@ -97,9 +109,11 @@
 <body>
 
   <div class="widget-container">
-    <!-- Heart Like Button with working GIF -->
+    <!-- Heart Like Button with Guaranteed SVG Heart -->
     <button class="like-btn" id="likeButton" onclick="addLike()">
-      <img id="heartIcon" class="heart-icon" src="https://upload.wikimedia.org/wikipedia/commons/4/42/Animated_Heart_Pulse.gif" alt="Heart">
+      <svg id="heartIcon" class="heart-icon heart-beating" viewBox="0 0 32 32" fill="#e74c3c">
+        <path d="M16 28c-.268 0-.535-.102-.738-.305l-11.23-11.23c-4.123-4.123-4.123-10.82 0-14.943 4.123-4.123 10.82-4.123 14.943 0l.525.525.525-.525c4.123-4.123 10.82-4.123 14.943 0 4.123 4.123 4.123 10.82 0 14.943l-11.23 11.23c-.203.203-.47.305-.738.305z"></path>
+      </svg>
       <span>Like</span>
       <span id="likeCount">...</span>
     </button>
@@ -157,9 +171,14 @@
     function addLike() {
       // Trigger extra puff animation on click
       const heart = document.getElementById('heartIcon');
-      heart.classList.remove('heart-puff');
-      void heart.offsetWidth; // Force browser reflow to restart animation
+      heart.classList.remove('heart-beating', 'heart-puff');
+      void heart.offsetWidth; // Force browser reflow
       heart.classList.add('heart-puff');
+      
+      // Resume continuous beating after click animation finishes
+      setTimeout(() => {
+        heart.classList.add('heart-beating');
+      }, 300);
 
       // Update Firebase database count
       likeRef.transaction((count) => {
