@@ -44,7 +44,12 @@
       background: #f8f8f8;
     }
 
-    /* Wrapper to isolate heart movement so text stays still */
+    .like-btn.liked {
+      cursor: default;
+      opacity: 0.85;
+    }
+
+    /* Wrapper to isolate heart movement */
     .heart-wrapper {
       display: inline-flex;
       align-items: center;
@@ -57,17 +62,17 @@
     @keyframes bumpAndGlow {
       0%, 100% { 
         transform: scale(1); 
-        fill: #ff1a40; /* Neon Red */
+        fill: #ff1a40; 
         filter: drop-shadow(0 0 5px #ff1a40); 
       }
       33% { 
         transform: scale(1.25); 
-        fill: #ff2a85; /* Hot Pink */
+        fill: #ff2a85; 
         filter: drop-shadow(0 0 9px #ff2a85); 
       }
       66% { 
         transform: scale(1.1); 
-        fill: #ff00ff; /* Magenta */
+        fill: #ff00ff; 
         filter: drop-shadow(0 0 14px #ff66cc); 
       }
     }
@@ -75,11 +80,12 @@
     .heart-icon {
       width: 26px;
       height: 26px;
+      fill: #ff1a40;
       animation: bumpAndGlow 1.4s infinite ease-in-out;
       transform-origin: center;
     }
 
-    /* Dynamic Click Effect: Bumping and Color Flash (Neon Red to Magenta strictly) */
+    /* Dynamic Click Effect: Bumping and Color Flash (Strictly Red to Magenta, NO BLACK) */
     @keyframes clickBump {
       0% { 
         transform: scale(1); 
@@ -88,12 +94,12 @@
       }
       30% { 
         transform: scale(1.6); 
-        fill: #ff00ff; /* Magenta flash */
+        fill: #ff00ff; 
         filter: drop-shadow(0 0 20px #ff66cc);
       }
       60% { 
         transform: scale(0.95); 
-        fill: #ff3399; /* Bright Pink */
+        fill: #ff3399; 
         filter: drop-shadow(0 0 10px #ff3399);
       }
       100% { 
@@ -146,7 +152,7 @@
           <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
         </svg>
       </span>
-      <span>Like</span>
+      <span id="btnText">Like</span>
       <span id="likeCount">...</span>
     </button>
 
@@ -193,35 +199,52 @@
     // Point to 'likes/itemId' inside your Firebase database
     const likeRef = db.ref('likes/' + itemId);
 
-    // 4. Sync count (Starts at 1 if brand new)
+    // 4. Sync count
     likeRef.on('value', (snapshot) => {
       const currentVal = snapshot.val();
       document.getElementById('likeCount').textContent = (currentVal === null) ? 1 : currentVal;
     });
 
-    // Cute, high-pitched magical sparkle chime sound effect
-    const clickSound = new Audio("https://cdn.freesound.org/previews/536/536108_11861866-lq.mp3");
-    clickSound.volume = 0.7;
+    // Check if user already clicked during this session
+    const sessionKey = 'liked_' + itemId;
+    if (sessionStorage.getItem(sessionKey) === 'true') {
+      document.getElementById('likeButton').classList.add('liked');
+      document.getElementById('btnText').textContent = 'Liked';
+    }
 
-    // 5. Add like on click & trigger bumping animation + cute sound
+    // Sound effect using your provided audio source
+    const clickSound = new Audio("https://cdn.freesound.org/previews/612/612749_5121236-lq.mp3");
+    clickSound.volume = 0.9;
+
+    // 5. Add like on click (only allowed once per session; refreshes allow clicking again)
     function addLike() {
-      clickSound.currentTime = 0;
-      clickSound.play().catch(e => console.log("Audio play blocked by browser policy until interaction"));
+      if (sessionStorage.getItem(sessionKey) === 'true') {
+        return; // Already liked this session
+      }
 
+      // Mark as liked in sessionStorage for this session
+      sessionStorage.setItem(sessionKey, 'true');
+      document.getElementById('likeButton').classList.add('liked');
+      document.getElementById('btnText').textContent = 'Liked';
+
+      // Play sound
+      clickSound.currentTime = 0;
+      clickSound.play().catch(e => console.log("Audio play blocked by browser policy"));
+
+      // Trigger animation
       const heart = document.getElementById('heartIcon');
       heart.classList.remove('heart-icon', 'heart-click-bump');
-      void heart.offsetWidth; // Force browser reflow
+      void heart.offsetWidth; // Force reflow
       heart.classList.add('heart-click-bump');
       
-      // Resume normal neon red-to-magenta bumping after the click animation finishes
       setTimeout(() => {
         heart.classList.add('heart-icon');
       }, 400);
 
-      // Update Firebase database count
+      // Update Firebase database count (+1)
       likeRef.transaction((count) => {
         if (count === null) {
-          return 2; // Starts at 1, so 1st click becomes 2
+          return 2; 
         }
         return count + 1;
       });
