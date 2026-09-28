@@ -199,20 +199,15 @@
       document.getElementById('likeCount').textContent = (currentVal === null) ? 1 : currentVal;
     });
 
-    // Function to say "Thank you" using browser speech synthesis
-    function playThankYouSound() {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance("Thank you");
-        utterance.rate = 1.1; 
-        utterance.pitch = 1.2; 
-        window.speechSynthesis.speak(utterance);
-      }
-    }
+    // Built-in audio click sound effect (Reliable embedded sound)
+    const clickSound = new Audio("https://actions.google.com/sounds/v1/cartoon/pop.ogg");
+    clickSound.volume = 0.6;
 
-    // 5. Add like on click & trigger bumping/color-shifting animation + sound
+    // 5. Add like on click & trigger bumping animation + sound effect
     function addLike() {
-      playThankYouSound();
+      // Play sound reliably
+      clickSound.currentTime = 0;
+      clickSound.play().catch(e => console.log("Audio play blocked by browser policy until interaction"));
 
       const heart = document.getElementById('heartIcon');
       heart.classList.remove('heart-icon', 'heart-click-bump');
