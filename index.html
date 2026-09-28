@@ -44,25 +44,29 @@
       background: #f8f8f8;
     }
 
-    /* Heart GIF Styling */
-    .heart-icon {
-      width: 18px;
-      height: 18px;
-      object-fit: contain;
-      display: inline-block;
-      vertical-align: middle;
-      transition: transform 0.2s ease;
+    /* Pure CSS Beating Heart */
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.3); }
     }
 
-    /* Puffing Animation */
+    .heart-icon {
+      color: #e74c3c;
+      font-size: 16px;
+      display: inline-block;
+      vertical-align: middle;
+      animation: heartbeat 1s infinite ease-in-out;
+    }
+
+    /* Puff animation on click */
     @keyframes puff {
       0% { transform: scale(1); }
-      50% { transform: scale(1.5); }
+      50% { transform: scale(1.6); }
       100% { transform: scale(1); }
     }
 
     .heart-puff {
-      animation: puff 0.3s ease;
+      animation: puff 0.3s ease !important;
     }
 
     /* Share Buttons Styling */
@@ -97,9 +101,9 @@
 <body>
 
   <div class="widget-container">
-    <!-- Heart Like Button with Embedded Base64 GIF -->
+    <!-- Heart Like Button with Pure CSS Beating Heart -->
     <button class="like-btn" id="likeButton" onclick="addLike()">
-      <img id="heartIcon" class="heart-icon" src="data:image/gif;base64,R0lGODlhEAAQAPUAAP///wAAAPz//Pz+/P/+/P////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////yH/C1hhcCBEYXRhWE1QAz94cGFja2V0IGJlZ2luPSfvu78nIGlkPSdXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQnPz4KPC94OnhtcG1ldGE+</code>
+      <span id="heartIcon" class="heart-icon">♥</span>
       <span>Like</span>
       <span id="likeCount">...</span>
     </button>
@@ -155,11 +159,15 @@
 
     // 5. Add like on click & trigger puff animation
     function addLike() {
-      // Trigger extra puff animation on click
       const heart = document.getElementById('heartIcon');
-      heart.classList.remove('heart-puff');
-      void heart.offsetWidth; // Force browser reflow
+      heart.classList.remove('heart-icon', 'heart-puff');
+      void heart.offsetWidth; // Force reflow to restart animation
       heart.classList.add('heart-puff');
+      
+      // Resume regular beating after click effect
+      setTimeout(() => {
+        heart.classList.add('heart-icon');
+      }, 300);
 
       // Update Firebase database count
       likeRef.transaction((count) => {
