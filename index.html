@@ -58,7 +58,7 @@
       height: 28px;
     }
 
-    /* Continuous Bumping & Color Shifting (Strictly Neon Red -> Hot Pink -> Magenta, NO BLACK) */
+    /* Continuous Bumping & Color Shifting (Neon Red -> Hot Pink -> Magenta, NO BLACK) */
     @keyframes bumpAndGlow {
       0%, 100% { 
         transform: scale(1); 
@@ -80,12 +80,11 @@
     .heart-icon {
       width: 26px;
       height: 26px;
-      fill: #ff1a40;
       animation: bumpAndGlow 1.4s infinite ease-in-out;
       transform-origin: center;
     }
 
-    /* Dynamic Click Effect: Bumping and Color Flash (Strictly Red to Magenta, NO BLACK) */
+    /* Click Effect: Bumping and Color Flash (Neon Red to Magenta strictly) */
     @keyframes clickBump {
       0% { 
         transform: scale(1); 
@@ -148,7 +147,8 @@
     <!-- Heart Like Button -->
     <button class="like-btn" id="likeButton" onclick="addLike()">
       <span class="heart-wrapper">
-        <svg id="heartIcon" class="heart-icon" viewBox="0 0 24 24">
+        <!-- fill="#ff1a40" guarantees it never defaults to black -->
+        <svg id="heartIcon" class="heart-icon" viewBox="0 0 24 24" fill="#ff1a40">
           <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
         </svg>
       </span>
@@ -175,73 +175,65 @@
     // 1. Read query parameters from the iframe link
     const urlParams = new URLSearchParams(window.location.search);
 
-    // Fallback values if none are provided in the URL
     const defaultUrl = "https://sites.google.com/moe-dl.edu.my/chkb-xcc5305/%E5%AD%A6%E6%A0%A1%E4%B8%8E%E7%A4%BE%E5%8C%BA-%E7%A4%BE%E5%8C%BA/%E6%B4%BB%E5%8A%A8-program-komuniti?authuser=0";
-
-    // Unique ID for Firebase (Defaults to item_1 for backward compatibility)
     const itemId = urlParams.get('id') || 'item_1';
-
-    // Share URL for Facebook and WhatsApp
     const targetShareUrl = urlParams.get('url') || defaultUrl;
 
-    // 2. Set share links dynamically
     document.getElementById('fbShare').href = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(targetShareUrl);
     document.getElementById('waShare').href = "https://api.whatsapp.com/send?text=" + encodeURIComponent(targetShareUrl);
 
-    // 3. Initialize Firebase Realtime Database
+    // 2. Initialize Firebase Realtime Database
     const firebaseConfig = {
       projectId: "xcc5305-like-program",
       databaseURL: "https://xcc5305-like-program-default-rtdb.asia-southeast1.firebasedatabase.app/"
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-
-    // Point to 'likes/itemId' inside your Firebase database
     const likeRef = db.ref('likes/' + itemId);
 
-    // 4. Sync count
     likeRef.on('value', (snapshot) => {
       const currentVal = snapshot.val();
       document.getElementById('likeCount').textContent = (currentVal === null) ? 1 : currentVal;
     });
 
-    // Check if user already clicked during this session
+    // 3. Session restriction (only 1 click per session; refreshing allows clicking again)
     const sessionKey = 'liked_' + itemId;
     if (sessionStorage.getItem(sessionKey) === 'true') {
       document.getElementById('likeButton').classList.add('liked');
       document.getElementById('btnText').textContent = 'Liked';
     }
 
-    // Sound effect using your provided audio source
+    // Audio setup using your uploaded sound file source
     const clickSound = new Audio("https://cdn.freesound.org/previews/612/612749_5121236-lq.mp3");
-    clickSound.volume = 0.9;
+    clickSound.volume = 1.0;
 
-    // 5. Add like on click (only allowed once per session; refreshes allow clicking again)
+    // 4. Add like on click
     function addLike() {
       if (sessionStorage.getItem(sessionKey) === 'true') {
-        return; // Already liked this session
+        return; // Already liked in this session
       }
 
-      // Mark as liked in sessionStorage for this session
       sessionStorage.setItem(sessionKey, 'true');
       document.getElementById('likeButton').classList.add('liked');
       document.getElementById('btnText').textContent = 'Liked';
 
       // Play sound
       clickSound.currentTime = 0;
-      clickSound.play().catch(e => console.log("Audio play blocked by browser policy"));
+      clickSound.play().catch(err => {
+        console.log("Audio playback restricted by browser policy:", err);
+      });
 
-      // Trigger animation
+      // Trigger heart animation bump
       const heart = document.getElementById('heartIcon');
       heart.classList.remove('heart-icon', 'heart-click-bump');
-      void heart.offsetWidth; // Force reflow
+      void heart.offsetWidth; 
       heart.classList.add('heart-click-bump');
       
       setTimeout(() => {
         heart.classList.add('heart-icon');
       }, 400);
 
-      // Update Firebase database count (+1)
+      // Increment Firebase count safely
       likeRef.transaction((count) => {
         if (count === null) {
           return 2; 
