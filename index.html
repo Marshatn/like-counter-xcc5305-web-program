@@ -44,14 +44,17 @@
       background: #f8f8f8;
     }
 
+    /* Heart GIF Styling */
     .heart-icon {
-      color: #e74c3c;
-      font-size: 16px;
+      width: 18px;
+      height: 18px;
+      object-fit: contain;
       display: inline-block;
+      vertical-align: middle;
       transition: transform 0.2s ease;
     }
 
-    /* Puffing Animation Class */
+    /* Extra puff effect when clicked */
     @keyframes puff {
       0% { transform: scale(1); }
       50% { transform: scale(1.4); }
@@ -94,9 +97,9 @@
 <body>
 
   <div class="widget-container">
-    <!-- Heart Like Button -->
+    <!-- Heart Like Button with GIF -->
     <button class="like-btn" id="likeButton" onclick="addLike()">
-      <span class="heart-icon" id="heartIcon">♥</span>
+      <img id="heartIcon" class="heart-icon" src="https://media.giphy.com/media/xT9IgusjX9hL8tZ3vW/giphy.gif" alt="Heart">
       <span>Like</span>
       <span id="likeCount">...</span>
     </button>
@@ -150,12 +153,12 @@
       document.getElementById('likeCount').textContent = (currentVal === null) ? 1 : currentVal;
     });
 
-    // 5. Add like on click & trigger heart puff animation
+    // 5. Add like on click & trigger extra puff animation
     function addLike() {
-      // Trigger puff animation
+      // Trigger extra puff animation on click
       const heart = document.getElementById('heartIcon');
       heart.classList.remove('heart-puff');
-      void heart.offsetWidth; // Force browser reflow to restart animation if clicked quickly
+      void heart.offsetWidth; // Force browser reflow to restart animation
       heart.classList.add('heart-puff');
 
       // Update Firebase database count
