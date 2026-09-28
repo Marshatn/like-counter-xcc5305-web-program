@@ -33,7 +33,7 @@
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       box-shadow: 0 1px 2px rgba(0,0,0,0.05);
       user-select: none;
       transition: background 0.2s, transform 0.1s;
@@ -44,29 +44,53 @@
       background: #f8f8f8;
     }
 
-    /* Pure CSS Beating Heart */
-    @keyframes heartbeat {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.3); }
+    /* Wrapper to keep the heart isolated so only the heart moves */
+    .heart-wrapper {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+    }
+
+    /* Big Neon Heart Styling & Continuous Pulse */
+    @keyframes neonPulse {
+      0%, 100% { 
+        transform: scale(1); 
+        filter: drop-shadow(0 0 3px #ff1493) drop-shadow(0 0 8px #ff69b4); 
+      }
+      50% { 
+        transform: scale(1.25); 
+        filter: drop-shadow(0 0 6px #ff1493) drop-shadow(0 0 14px #ff69b4); 
+      }
     }
 
     .heart-icon {
-      color: #e74c3c;
-      font-size: 16px;
-      display: inline-block;
-      vertical-align: middle;
-      animation: heartbeat 1s infinite ease-in-out;
+      width: 24px;
+      height: 24px;
+      fill: #ff2a85; /* Neon Hot Pink */
+      animation: neonPulse 1.2s infinite ease-in-out;
+      transform-origin: center;
     }
 
-    /* Puff animation on click */
-    @keyframes puff {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.6); }
-      100% { transform: scale(1); }
+    /* Puff animation on click (only affects heart) */
+    @keyframes neonPuff {
+      0% { 
+        transform: scale(1); 
+        filter: drop-shadow(0 0 4px #ff1493) drop-shadow(0 0 10px #ff69b4); 
+      }
+      50% { 
+        transform: scale(1.7); 
+        filter: drop-shadow(0 0 10px #ff1493) drop-shadow(0 0 22px #ffff00); 
+      }
+      100% { 
+        transform: scale(1); 
+        filter: drop-shadow(0 0 4px #ff1493) drop-shadow(0 0 10px #ff69b4); 
+      }
     }
 
     .heart-puff {
-      animation: puff 0.3s ease !important;
+      animation: neonPuff 0.35s ease !important;
     }
 
     /* Share Buttons Styling */
@@ -101,9 +125,13 @@
 <body>
 
   <div class="widget-container">
-    <!-- Heart Like Button with Pure CSS Beating Heart -->
+    <!-- Heart Like Button -->
     <button class="like-btn" id="likeButton" onclick="addLike()">
-      <span id="heartIcon" class="heart-icon">♥</span>
+      <span class="heart-wrapper">
+        <svg id="heartIcon" class="heart-icon" viewBox="0 0 24 24">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+      </span>
       <span>Like</span>
       <span id="likeCount">...</span>
     </button>
@@ -157,17 +185,17 @@
       document.getElementById('likeCount').textContent = (currentVal === null) ? 1 : currentVal;
     });
 
-    // 5. Add like on click & trigger puff animation
+    // 5. Add like on click & trigger neon puff animation
     function addLike() {
       const heart = document.getElementById('heartIcon');
       heart.classList.remove('heart-icon', 'heart-puff');
-      void heart.offsetWidth; // Force reflow to restart animation
+      void heart.offsetWidth; // Force browser reflow
       heart.classList.add('heart-puff');
       
-      // Resume regular beating after click effect
+      // Resume regular neon pulsing after click effect finishes
       setTimeout(() => {
         heart.classList.add('heart-icon');
-      }, 300);
+      }, 350);
 
       // Update Firebase database count
       likeRef.transaction((count) => {
