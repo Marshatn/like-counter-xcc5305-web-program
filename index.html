@@ -47,6 +47,19 @@
     .heart-icon {
       color: #e74c3c;
       font-size: 16px;
+      display: inline-block;
+      transition: transform 0.2s ease;
+    }
+
+    /* Puffing Animation Class */
+    @keyframes puff {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.4); }
+      100% { transform: scale(1); }
+    }
+
+    .heart-puff {
+      animation: puff 0.3s ease;
     }
 
     /* Share Buttons Styling */
@@ -83,7 +96,7 @@
   <div class="widget-container">
     <!-- Heart Like Button -->
     <button class="like-btn" id="likeButton" onclick="addLike()">
-      <span class="heart-icon">♥</span>
+      <span class="heart-icon" id="heartIcon">♥</span>
       <span>Like</span>
       <span id="likeCount">...</span>
     </button>
@@ -137,8 +150,15 @@
       document.getElementById('likeCount').textContent = (currentVal === null) ? 1 : currentVal;
     });
 
-    // 5. Add like on click
+    // 5. Add like on click & trigger heart puff animation
     function addLike() {
+      // Trigger puff animation
+      const heart = document.getElementById('heartIcon');
+      heart.classList.remove('heart-puff');
+      void heart.offsetWidth; // Force browser reflow to restart animation if clicked quickly
+      heart.classList.add('heart-puff');
+
+      // Update Firebase database count
       likeRef.transaction((count) => {
         if (count === null) {
           return 2; // Starts at 1, so 1st click becomes 2
